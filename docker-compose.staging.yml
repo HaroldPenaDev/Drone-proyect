@@ -1,0 +1,16 @@
+services:
+  simulator:
+    environment:
+      SIMULATOR_INTERVAL_MS: 500
+    restart: always
+
+  api:
+    environment:
+      SAFETY_FACTOR_THRESHOLD: 1.5
+    restart: always
+
+  frontend:
+    restart: always
+
+  nginx:
+    restart: always
