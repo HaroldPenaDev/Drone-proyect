@@ -13,6 +13,7 @@ from src.routers import (
     telemetry_router,
     alerts_router,
     websocket_router,
+    kpis_router,
 )
 
 settings = ApiSettings()
@@ -46,3 +47,4 @@ app.include_router(missions_router)
 app.include_router(telemetry_router)
 app.include_router(alerts_router)
 app.include_router(websocket_router)
+app.include_router(kpis_router)

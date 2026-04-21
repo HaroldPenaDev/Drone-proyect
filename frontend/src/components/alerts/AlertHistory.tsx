@@ -13,7 +13,7 @@ export function AlertHistory() {
   }, [selectedDrone, loadAlerts]);
 
   if (alerts.length === 0) {
-    return <div className="text-gray-500 text-sm py-4">No alerts recorded</div>;
+    return <div className="text-gray-500 text-sm py-4">No hay alertas registradas</div>;
   }
 
   return (

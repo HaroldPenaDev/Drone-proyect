@@ -16,7 +16,12 @@ class InfluxDBWriter:
         self._bucket: str = settings.influxdb_bucket
         self._org: str = settings.influxdb_org
 
-    def write_state(self, state: DroneState, drone_id: str) -> None:
+    def write_state(
+        self,
+        state: DroneState,
+        drone_id: str,
+        movement: str = "hover",
+    ) -> None:
         points: list[Point] = []
         for i in range(4):
             motor = state.motors[i]
@@ -38,6 +43,7 @@ class InfluxDBWriter:
         position_point = (
             Point("drone_position")
             .tag("drone_id", drone_id)
+            .tag("movement", movement)
             .field("x", float(state.position[0]))
             .field("y", float(state.position[1]))
             .field("z", float(state.position[2]))

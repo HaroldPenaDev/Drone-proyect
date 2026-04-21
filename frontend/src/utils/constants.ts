@@ -1,10 +1,10 @@
 export const SAFETY_FACTOR_THRESHOLD = 1.5;
 
 export const ARM_LABELS: readonly string[] = [
-  "Front-Right",
-  "Front-Left",
-  "Rear-Left",
-  "Rear-Right",
+  "Frontal-Derecho",
+  "Frontal-Izquierdo",
+  "Trasero-Izquierdo",
+  "Trasero-Derecho",
 ];
 
 export const STATUS_COLORS = {

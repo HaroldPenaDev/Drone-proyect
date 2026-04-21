@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Dashboard" },
-  { to: "/missions", label: "Missions" },
-  { to: "/history", label: "History" },
+  { to: "/", label: "Panel Principal" },
+  { to: "/missions", label: "Misiones" },
+  { to: "/history", label: "Historial" },
 ] as const;
 
 export function Sidebar() {

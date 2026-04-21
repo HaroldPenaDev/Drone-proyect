@@ -13,9 +13,16 @@ const STATUS_BADGES: Record<string, string> = {
   aborted: "bg-red-900/50 text-red-400",
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: "pendiente",
+  running: "en curso",
+  completed: "completada",
+  aborted: "abortada",
+};
+
 export function MissionList({ missions, onStart, onStop }: MissionListProps) {
   if (missions.length === 0) {
-    return <div className="text-gray-500 text-sm py-4">No missions yet</div>;
+    return <div className="text-gray-500 text-sm py-4">Aún no hay misiones</div>;
   }
 
   return (
@@ -28,7 +35,7 @@ export function MissionList({ missions, onStart, onStop }: MissionListProps) {
           <div>
             <div className="flex items-center gap-2">
               <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_BADGES[mission.status]}`}>
-                {mission.status}
+                {STATUS_LABELS[mission.status] ?? mission.status}
               </span>
               <span className="text-xs text-gray-400">
                 {new Date(mission.created_at).toLocaleString()}
@@ -44,7 +51,7 @@ export function MissionList({ missions, onStart, onStop }: MissionListProps) {
                 onClick={() => onStart(mission.id)}
                 className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
               >
-                Start
+                Iniciar
               </button>
             )}
             {mission.status === "running" && (
@@ -52,7 +59,7 @@ export function MissionList({ missions, onStart, onStop }: MissionListProps) {
                 onClick={() => onStop(mission.id)}
                 className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
               >
-                Stop
+                Detener
               </button>
             )}
           </div>

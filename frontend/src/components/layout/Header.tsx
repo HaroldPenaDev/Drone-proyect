@@ -15,7 +15,7 @@ export function Header() {
 
   return (
     <header className="h-14 bg-drone-panel border-b border-drone-border flex items-center justify-between px-6">
-      <h1 className="text-lg font-bold text-white">Drone Digital Twin</h1>
+      <h1 className="text-lg font-bold text-white">Gemelo Digital de Dron</h1>
       <div className="flex items-center gap-4">
         <select
           className="bg-drone-dark border border-drone-border rounded px-3 py-1 text-sm text-white"

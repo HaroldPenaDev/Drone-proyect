@@ -25,7 +25,7 @@ export function SafetyFactorGauge({ armIndex, value }: SafetyFactorGaugeProps) {
         />
       </div>
       <div className="text-xs text-gray-500 mt-1">
-        Threshold: {SAFETY_FACTOR_THRESHOLD}
+        Umbral: {SAFETY_FACTOR_THRESHOLD}
       </div>
     </div>
   );

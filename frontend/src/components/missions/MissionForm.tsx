@@ -7,6 +7,18 @@ const AVAILABLE_MOVEMENTS = [
   "forward", "backward", "clockwise", "counterclockwise",
 ] as const;
 
+const MOVEMENT_LABELS: Record<string, string> = {
+  hover: "flotar",
+  ascend: "ascender",
+  descend: "descender",
+  left: "izquierda",
+  right: "derecha",
+  forward: "adelante",
+  backward: "atrás",
+  clockwise: "horario",
+  counterclockwise: "antihorario",
+};
+
 interface MissionFormProps {
   onSubmit: (data: MissionCreate) => Promise<void>;
 }
@@ -34,7 +46,7 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
 
   return (
     <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
-      <h3 className="text-sm font-semibold text-gray-300 mb-3">New Mission</h3>
+      <h3 className="text-sm font-semibold text-gray-300 mb-3">Nueva Misión</h3>
       <div className="flex flex-wrap gap-2 mb-3">
         {AVAILABLE_MOVEMENTS.map((m) => (
           <button
@@ -42,7 +54,7 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
             onClick={() => addMovement(m)}
             className="px-2 py-1 text-xs bg-drone-dark border border-drone-border rounded hover:border-drone-primary text-gray-300"
           >
-            {m}
+            {MOVEMENT_LABELS[m]}
           </button>
         ))}
       </div>
@@ -53,7 +65,7 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
             onClick={() => removeMovement(i)}
             className="px-2 py-1 text-xs bg-drone-primary/20 text-drone-primary rounded cursor-pointer hover:bg-drone-primary/30"
           >
-            {m} x
+            {MOVEMENT_LABELS[m]} x
           </span>
         ))}
       </div>
@@ -62,7 +74,7 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
         disabled={submitting || !selectedDrone || movements.length === 0}
         className="w-full py-2 bg-drone-primary text-white rounded text-sm font-medium disabled:opacity-50 hover:bg-blue-600 transition-colors"
       >
-        {submitting ? "Creating..." : "Create Mission"}
+        {submitting ? "Creando..." : "Crear Misión"}
       </button>
     </div>
   );

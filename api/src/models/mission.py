@@ -26,7 +26,8 @@ class Mission(Base):
         UUID(as_uuid=True), ForeignKey("drones.id"), nullable=False
     )
     status: Mapped[MissionStatus] = mapped_column(
-        Enum(MissionStatus), default=MissionStatus.PENDING
+        Enum(MissionStatus, values_callable=lambda e: [m.value for m in e]),
+        default=MissionStatus.PENDING,
     )
     movements: Mapped[list] = mapped_column(JSON, default=list)
     started_at: Mapped[datetime | None] = mapped_column(

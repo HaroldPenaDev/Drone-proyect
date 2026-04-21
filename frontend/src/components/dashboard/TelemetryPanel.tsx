@@ -13,7 +13,7 @@ export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
   if (!snapshot) {
     return (
       <div className="text-gray-500 text-center py-8">
-        Waiting for telemetry data...
+        Esperando datos de telemetría...
       </div>
     );
   }
@@ -21,7 +21,7 @@ export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Safety Factor</h2>
+        <h2 className="text-sm font-semibold text-gray-300 mb-3">Factor de Seguridad</h2>
         <div className="grid grid-cols-4 gap-3">
           {snapshot.arms.map((arm) => (
             <SafetyFactorGauge
@@ -33,7 +33,7 @@ export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
         </div>
       </div>
       <div>
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Material Health</h2>
+        <h2 className="text-sm font-semibold text-gray-300 mb-3">Salud del Material</h2>
         <div className="grid grid-cols-4 gap-3">
           {snapshot.arms.map((arm) => (
             <MaterialHealthBar
@@ -45,11 +45,11 @@ export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
         </div>
       </div>
       <div>
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Motor Output</h2>
+        <h2 className="text-sm font-semibold text-gray-300 mb-3">Salida de Motores</h2>
         <div className="grid grid-cols-2 gap-3">
           {snapshot.arms.map((arm) => (
             <div key={arm.arm_index} className="bg-drone-panel rounded-lg p-3 border border-drone-border">
-              <span className="text-xs text-gray-400">Arm {arm.arm_index}</span>
+              <span className="text-xs text-gray-400">Brazo {arm.arm_index}</span>
               <div className="flex gap-4 mt-1">
                 <span className="text-sm text-blue-400">T: {formatNewtons(arm.thrust)}</span>
                 <span className="text-sm text-amber-400">Q: {arm.torque.toFixed(4)} Nm</span>

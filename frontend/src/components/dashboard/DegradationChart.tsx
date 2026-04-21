@@ -35,7 +35,7 @@ export function DegradationChart({ data }: DegradationChartProps) {
   return (
     <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
       <h3 className="text-sm font-medium text-gray-300 mb-3">
-        Material Degradation Over Time
+        Degradación del Material en el Tiempo
       </h3>
       <ResponsiveContainer width="100%" height={250}>
         <AreaChart data={chartData}>

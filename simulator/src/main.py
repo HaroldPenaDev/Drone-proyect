@@ -13,28 +13,16 @@ from src.engines.structural_engine import compute_all_safety_factors
 from src.engines.material_engine import compute_cycle_degradation
 from src.engines.structural_engine import compute_max_bending_stress_mpa, compute_bending_moment
 from src.writers.influxdb_writer import InfluxDBWriter
+from src.mission_loader import MissionLoader
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-MOVEMENT_SEQUENCE: list[Movement] = [
-    Movement.HOVER,
-    Movement.ASCEND,
-    Movement.HOVER,
-    Movement.FORWARD,
-    Movement.HOVER,
-    Movement.LEFT,
-    Movement.HOVER,
-    Movement.CLOCKWISE,
-    Movement.HOVER,
-    Movement.DESCEND,
-]
 
 shutdown_event: asyncio.Event = asyncio.Event()
 
 
 def _pick_movement(cycle: int) -> Movement:
-    return MOVEMENT_SEQUENCE[cycle % len(MOVEMENT_SEQUENCE)]
+    return Movement.HOVER
 
 
 async def simulation_loop(settings: SimulatorSettings) -> None:
@@ -43,10 +31,25 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
     dt: float = settings.simulator_interval_ms / 1000.0
     cycle: int = 0
 
+    dsn = (
+        f"postgresql://{settings.postgres_user}:{settings.postgres_password}"
+        f"@{settings.postgres_host}:{settings.postgres_port}/{settings.postgres_db}"
+    )
+    mission_loader = MissionLoader(
+        dsn=dsn,
+        drone_name=settings.simulator_drone_id,
+        cycles_per_movement=settings.mission_cycles_per_movement,
+    )
+    try:
+        await mission_loader.connect()
+    except Exception as exc:
+        logger.warning("MissionLoader could not connect to Postgres: %s — falling back to hardcoded sequence", exc)
+
     logger.info("Simulator started for drone %s", settings.simulator_drone_id)
 
     while not shutdown_event.is_set():
-        movement: Movement = _pick_movement(cycle)
+        mission_movement = await mission_loader.next_movement()
+        movement: Movement = mission_movement if mission_movement is not None else _pick_movement(cycle)
         state = integrate_state(state, movement, dt)
 
         thrusts = tuple(m.thrust_newtons for m in state.motors)
@@ -71,7 +74,8 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
             timestamp=time.time(),
         )
 
-        writer.write_state(state, settings.simulator_drone_id)
+        tag_id: str = str(mission_loader.drone_id) if mission_loader.drone_id is not None else settings.simulator_drone_id
+        writer.write_state(state, tag_id, movement=movement.value)
         cycle += 1
 
         if cycle % 20 == 0:
@@ -86,6 +90,7 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
         await asyncio.sleep(dt)
 
     writer.close()
+    await mission_loader.close()
     logger.info("Simulator stopped")
 
 

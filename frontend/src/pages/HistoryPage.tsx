@@ -26,7 +26,7 @@ export function HistoryPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">History</h2>
+        <h2 className="text-lg font-semibold text-white">Historial</h2>
         <div className="flex gap-2">
           {TIME_RANGES.map((range) => (
             <button
@@ -54,7 +54,7 @@ export function HistoryPage() {
                 : "bg-drone-panel text-gray-400 border border-drone-border"
             }`}
           >
-            Arm {arm}
+            Brazo {arm}
           </button>
         ))}
       </div>
@@ -64,7 +64,7 @@ export function HistoryPage() {
       </div>
       <div>
         <h3 className="text-sm font-semibold text-gray-300 mb-3">
-          Alert History
+          Historial de Alertas
         </h3>
         <AlertHistory />
       </div>

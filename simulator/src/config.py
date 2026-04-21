@@ -11,3 +11,11 @@ class SimulatorSettings(BaseSettings):
 
     simulator_interval_ms: int = 500
     simulator_drone_id: str = "stmu-quad-001"
+
+    postgres_host: str = "postgres"
+    postgres_port: int = 5432
+    postgres_db: str = "drone_twin"
+    postgres_user: str = "drone"
+    postgres_password: str = "drone_dev"
+
+    mission_cycles_per_movement: int = 10

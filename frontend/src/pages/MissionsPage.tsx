@@ -21,7 +21,7 @@ export function MissionsPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-white">Missions</h2>
+      <h2 className="text-lg font-semibold text-white">Misiones</h2>
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-1 space-y-4">
           <MissionForm onSubmit={handleCreate} />
@@ -29,7 +29,7 @@ export function MissionsPage() {
         </div>
         <div className="col-span-2">
           <h3 className="text-sm font-semibold text-gray-300 mb-3">
-            Mission History
+            Historial de Misiones
           </h3>
           <MissionList
             missions={missions}

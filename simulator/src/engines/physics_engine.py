@@ -110,7 +110,10 @@ def integrate_state(state: DroneState, movement: Movement, dt: float) -> DroneSt
     new_angular_velocity: NDArray[np.float64] = final[9:12]
     new_acceleration: NDArray[np.float64] = total_force / DRONE_MASS_KG
 
-    new_position[2] = max(new_position[2], 0.0)
+    if new_position[2] < 0.0:
+        new_position[2] = 0.0
+        if new_velocity[2] < 0.0:
+            new_velocity[2] = 0.0
 
     return DroneState(
         position=new_position,

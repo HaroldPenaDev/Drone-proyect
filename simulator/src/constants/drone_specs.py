@@ -1,12 +1,12 @@
-DRONE_MASS_KG: float = 1.2
+DRONE_MASS_KG: float = 1.2336
 ARM_LENGTH_M: float = 0.25
 ARM_COUNT: int = 4
-ARM_MASS_KG: float = 0.08
+ARM_MASS_KG: float = 0.092
 CROSS_SECTION_AREA_M2: float = 2.5e-4
 CROSS_SECTION_HEIGHT_M: float = 0.01
 MOMENT_OF_INERTIA_M4: float = 5.2e-10
 GRAVITY_M_S2: float = 9.81
 
-INERTIA_XX: float = 2.0 * ARM_MASS_KG * ARM_LENGTH_M**2 / 3.0
-INERTIA_YY: float = INERTIA_XX
-INERTIA_ZZ: float = 4.0 * ARM_MASS_KG * ARM_LENGTH_M**2 / 3.0
+INERTIA_XX: float = 1.5933e-5
+INERTIA_YY: float = 2.9438e-5
+INERTIA_ZZ: float = 1.5033e-5

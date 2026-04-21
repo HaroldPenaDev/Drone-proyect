@@ -28,7 +28,7 @@ export function ThrustTorqueChart({ data, armIndex }: ThrustTorqueChartProps) {
   return (
     <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
       <h3 className="text-sm font-medium text-gray-300 mb-3">
-        Thrust / Torque - Arm {armIndex}
+        Empuje / Torque - Brazo {armIndex}
       </h3>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={filtered}>

@@ -15,11 +15,11 @@ export function AlertBanner() {
         <span className="text-red-400 text-lg">&#9888;</span>
         <div>
           <span className="text-sm text-red-300 font-medium">
-            {unreadCount} active alert{unreadCount > 1 ? "s" : ""}
+            {unreadCount} alerta{unreadCount > 1 ? "s" : ""} activa{unreadCount > 1 ? "s" : ""}
           </span>
           {latestAlert && (
             <p className="text-xs text-red-400/70">
-              Arm {latestAlert.arm_index}: Safety factor {latestAlert.safety_factor_value.toFixed(2)} below {latestAlert.threshold}
+              Brazo {latestAlert.arm_index}: Factor de seguridad {latestAlert.safety_factor_value.toFixed(2)} por debajo de {latestAlert.threshold}
             </p>
           )}
         </div>
@@ -28,7 +28,7 @@ export function AlertBanner() {
         onClick={markAllRead}
         className="px-3 py-1 text-xs bg-red-800 text-red-200 rounded hover:bg-red-700"
       >
-        Dismiss
+        Descartar
       </button>
     </div>
   );

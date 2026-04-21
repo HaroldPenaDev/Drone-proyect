@@ -5,4 +5,6 @@ export type {
   TelemetryPoint,
   ArmSnapshot,
   DroneSnapshot,
+  DronePosition,
+  DroneKpis,
 } from "@/types/telemetry";
