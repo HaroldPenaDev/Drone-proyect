@@ -1,7 +1,6 @@
 import asyncio
 import signal
 import logging
-import random
 import time
 
 from src.config import SimulatorSettings
@@ -9,9 +8,13 @@ from src.models.drone_state import DroneState
 from src.models.material import Material
 from src.constants.motor_specs import Movement
 from src.engines.physics_engine import integrate_state
-from src.engines.structural_engine import compute_all_safety_factors
+from src.engines.structural_engine import (
+    compute_all_safety_factors,
+    compute_max_bending_stress_mpa,
+    compute_bending_moment,
+    compute_shear_stress_mpa,
+)
 from src.engines.material_engine import compute_cycle_degradation
-from src.engines.structural_engine import compute_max_bending_stress_mpa, compute_bending_moment
 from src.writers.influxdb_writer import InfluxDBWriter
 from src.mission_loader import MissionLoader
 
@@ -56,9 +59,14 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
         safety_factors = compute_all_safety_factors(state.material_states, thrusts)
 
         new_materials: list[Material] = []
+        bending_stress_list: list[float] = []
+        shear_stress_list: list[float] = []
         for i in range(4):
             bm = compute_bending_moment(thrusts[i])
             stress = compute_max_bending_stress_mpa(bm)
+            shear = compute_shear_stress_mpa(thrusts[i])
+            bending_stress_list.append(stress)
+            shear_stress_list.append(shear)
             updated = compute_cycle_degradation(state.material_states[i], stress)
             new_materials.append(updated)
 
@@ -71,6 +79,8 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
             motors=state.motors,
             material_states=(new_materials[0], new_materials[1], new_materials[2], new_materials[3]),
             safety_factors=safety_factors,
+            bending_stresses=(bending_stress_list[0], bending_stress_list[1], bending_stress_list[2], bending_stress_list[3]),
+            shear_stresses=(shear_stress_list[0], shear_stress_list[1], shear_stress_list[2], shear_stress_list[3]),
             timestamp=time.time(),
         )
 

@@ -85,12 +85,15 @@ def query_latest_snapshot(
                     safety_factor=float(record.values.get("safety_factor", 10.0)),
                     degradation_factor=float(record.values.get("degradation_factor", 0.0)),
                     rpm=float(record.values.get("rpm", 0.0)),
+                    bending_stress_mpa=float(record.values.get("bending_stress_mpa", 0.0)),
+                    shear_stress_mpa=float(record.values.get("shear_stress_mpa", 0.0)),
                 )
             )
     while len(arms) < 4:
         arms.append(DroneSnapshotArm(
             arm_index=len(arms), thrust=0.0, torque=0.0,
             safety_factor=10.0, degradation_factor=0.0, rpm=0.0,
+            bending_stress_mpa=0.0, shear_stress_mpa=0.0,
         ))
     arms.sort(key=lambda a: a.arm_index)
 
