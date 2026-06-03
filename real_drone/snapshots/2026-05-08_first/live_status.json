@@ -1,0 +1,43 @@
+=== Live snapshot ===
+{
+  "RAW_IMU_seen": true,
+  "SYS_STATUS": {
+    "voltage_V": 0.0,
+    "current_A": null,
+    "battery_remaining_pct": -1,
+    "sensors_present": "0x5370fc0f",
+    "sensors_enabled": "0x50609c0f",
+    "sensors_health": "0x53709c0f",
+    "errors_count1": 0
+  },
+  "SERVO_OUTPUT_us": [
+    1000,
+    1000,
+    1000,
+    1000,
+    0,
+    0,
+    0,
+    0
+  ],
+  "RC_CHANNELS": {
+    "rssi": 255,
+    "chancount": 0,
+    "channels_us": []
+  },
+  "BARO_press_hPa": 789.400146484375,
+  "BARO_temp_C": 47.59,
+  "GPS": {
+    "fix_type": 0,
+    "satellites": 0,
+    "hdop": null,
+    "lat": 0.0,
+    "lon": 0.0,
+    "alt_msl_m": 0.0
+  },
+  "ATTITUDE": {
+    "roll_deg": 1.3,
+    "pitch_deg": -0.45,
+    "yaw_deg": -44.35
+  }
+}

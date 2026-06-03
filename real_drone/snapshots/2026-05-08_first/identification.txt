@@ -1,0 +1,26 @@
+[+] Connecting to /dev/cu.usbmodem101 @ 115200...
+[+] Waiting for HEARTBEAT (timeout 10s)...
+[OK] sysid=1 compid=0
+     autopilot = ARDUPILOTMEGA
+     vehicle   = QUADROTOR
+     base_mode = 0x51  custom_mode = 0
+     system_status = 3
+
+[AUTOPILOT_VERSION]
+  flight_sw_version    = 4.2.3 (OFFICIAL)
+  middleware_sw_version= 0.0.0 (DEV)
+  os_sw_version        = 0.0.0 (DEV)
+  board_version        = 68681728
+  vendor_id            = 0x1209
+  product_id           = 0x5741
+  capabilities bitmask = 0x000000000000FBEF
+
+[+] Message types in 8s: ['AUTOPILOT_VERSION', 'COMMAND_ACK', 'HEARTBEAT', 'PARAM_VALUE', 'STATUSTEXT', 'TIMESYNC']
+
+[BANNER / STATUSTEXT]
+  ArduCopter V4.2.3 (a480c0a7)
+  ChibiOS: 38022f4f
+  KakuteH7 00320041 33305118 36353839
+  RCOut: PWM:1-8 NeoP:9
+  IMU0: fast sampling enabled 8.0kHz/2.0kHz
+  Frame: QUAD/X
