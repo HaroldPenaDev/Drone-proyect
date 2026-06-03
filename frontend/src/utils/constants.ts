@@ -1,10 +1,24 @@
+import type { TranslationKey } from "@/i18n";
+
 export const SAFETY_FACTOR_THRESHOLD = 1.5;
 
+/**
+ * @deprecated Use ARM_LABEL_KEYS with `useT()` for localized labels.
+ * Kept for back-compat; resolves to English position descriptors.
+ */
 export const ARM_LABELS: readonly string[] = [
   "Front-Right",
   "Front-Left",
   "Rear-Left",
   "Rear-Right",
+];
+
+/** Translation keys for arm labels, indexed by arm_index 0..3. */
+export const ARM_LABEL_KEYS: readonly TranslationKey[] = [
+  "arms.frontRight",
+  "arms.frontLeft",
+  "arms.rearLeft",
+  "arms.rearRight",
 ];
 
 export const STATUS_COLORS = {

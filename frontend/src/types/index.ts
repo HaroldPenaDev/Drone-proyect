@@ -5,4 +5,24 @@ export type {
   TelemetryPoint,
   ArmSnapshot,
   DroneSnapshot,
+  DroneKpis,
 } from "@/types/telemetry";
+export type {
+  ArmAnalytics,
+  TelemetrySample,
+  MissionAnalytics,
+  ComparisonResponse,
+} from "@/types/analytics";
+export type { IngestSummary } from "@/types/ingest";
+export type {
+  HealthStatus,
+  ArmPrediction,
+  DronePrediction,
+} from "@/types/predictive";
+export type {
+  PairedSample,
+  ValidationDeltas,
+  ValidationResponse,
+  SuggestedPair,
+  ValidationCandidates,
+} from "@/types/validation";

@@ -2,7 +2,7 @@ import { SafetyFactorGauge } from "@/components/dashboard/SafetyFactorGauge";
 import { MaterialHealthBar } from "@/components/dashboard/MaterialHealthBar";
 import { ThrustTorqueChart } from "@/components/dashboard/ThrustTorqueChart";
 import type { DroneSnapshot, TelemetryPoint } from "@/types";
-import { formatNewtons } from "@/utils/formatters";
+import { useT } from "@/i18n";
 
 interface TelemetryPanelProps {
   snapshot: DroneSnapshot | null;
@@ -10,19 +10,29 @@ interface TelemetryPanelProps {
 }
 
 export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
+  const t = useT();
+
   if (!snapshot) {
     return (
-      <div className="text-gray-500 text-center py-8">
-        Waiting for telemetry data...
+      <div className="surface px-6 py-12 text-center">
+        <div className="text-ink-500 text-sm font-display">
+          {t("common.waitingTelemetry")}
+        </div>
+        <div className="text-ink-500/60 text-[11px] font-mono mt-1">
+          {t("common.startMission")}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Safety Factor</h2>
-        <div className="grid grid-cols-4 gap-3">
+    <div className="space-y-5">
+      <section>
+        <div className="flex items-baseline justify-between mb-2.5">
+          <h3 className="section-title">{t("dashboard.section.safety")}</h3>
+          <span className="eyebrow">{t("dashboard.section.safetyHint")}</span>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {snapshot.arms.map((arm) => (
             <SafetyFactorGauge
               key={arm.arm_index}
@@ -31,10 +41,14 @@ export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
             />
           ))}
         </div>
-      </div>
-      <div>
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Material Health</h2>
-        <div className="grid grid-cols-4 gap-3">
+      </section>
+
+      <section>
+        <div className="flex items-baseline justify-between mb-2.5">
+          <h3 className="section-title">{t("dashboard.section.material")}</h3>
+          <span className="eyebrow">{t("dashboard.section.materialHint")}</span>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {snapshot.arms.map((arm) => (
             <MaterialHealthBar
               key={arm.arm_index}
@@ -43,25 +57,23 @@ export function TelemetryPanel({ snapshot, history }: TelemetryPanelProps) {
             />
           ))}
         </div>
-      </div>
-      <div>
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Motor Output</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {snapshot.arms.map((arm) => (
-            <div key={arm.arm_index} className="bg-drone-panel rounded-lg p-3 border border-drone-border">
-              <span className="text-xs text-gray-400">Arm {arm.arm_index}</span>
-              <div className="flex gap-4 mt-1">
-                <span className="text-sm text-blue-400">T: {formatNewtons(arm.thrust)}</span>
-                <span className="text-sm text-amber-400">Q: {arm.torque.toFixed(4)} Nm</span>
-              </div>
-            </div>
+      </section>
+
+      <section>
+        <div className="flex items-baseline justify-between mb-2.5">
+          <h3 className="section-title">{t("dashboard.section.motors")}</h3>
+          <span className="eyebrow">{t("dashboard.section.motorsHint")}</span>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {snapshot.arms.slice(0, 2).map((arm) => (
+            <ThrustTorqueChart
+              key={arm.arm_index}
+              data={history}
+              armIndex={arm.arm_index}
+            />
           ))}
         </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <ThrustTorqueChart data={history} armIndex={0} />
-        <ThrustTorqueChart data={history} armIndex={1} />
-      </div>
+      </section>
     </div>
   );
 }

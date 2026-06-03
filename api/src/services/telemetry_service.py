@@ -57,6 +57,31 @@ def query_telemetry_history(
     return points
 
 
+def _query_latest_position(
+    query_api: QueryApi, settings: ApiSettings, drone_id: str
+) -> dict[str, float]:
+    flux = (
+        f'from(bucket: "{settings.influxdb_bucket}")'
+        f" |> range(start: -10s)"
+        f' |> filter(fn: (r) => r._measurement == "drone_position")'
+        f' |> filter(fn: (r) => r.drone_id == "{drone_id}")'
+        f" |> last()"
+        f' |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")'
+    )
+    out: dict[str, float] = {"altitude": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0}
+    try:
+        tables = query_api.query(flux, org=settings.influxdb_org)
+        for table in tables:
+            for record in table.records:
+                out["altitude"] = float(record.values.get("z", 0.0) or 0.0)
+                out["roll"] = float(record.values.get("roll", 0.0) or 0.0)
+                out["pitch"] = float(record.values.get("pitch", 0.0) or 0.0)
+                out["yaw"] = float(record.values.get("yaw", 0.0) or 0.0)
+    except Exception:
+        pass
+    return out
+
+
 def query_latest_snapshot(
     query_api: QueryApi,
     settings: ApiSettings,
@@ -91,6 +116,15 @@ def query_latest_snapshot(
             safety_factor=10.0, degradation_factor=0.0,
         ))
     arms.sort(key=lambda a: a.arm_index)
+
+    pos = _query_latest_position(query_api, settings, drone_id)
+
     return DroneSnapshotRead(
-        drone_id=drone_id, timestamp=latest_time, arms=arms[:4]
+        drone_id=drone_id,
+        timestamp=latest_time,
+        arms=arms[:4],
+        altitude=pos["altitude"],
+        roll=pos["roll"],
+        pitch=pos["pitch"],
+        yaw=pos["yaw"],
     )

@@ -4,9 +4,12 @@ import { MissionForm } from "@/components/missions/MissionForm";
 import { MissionDetail } from "@/components/missions/MissionDetail";
 import { MissionList } from "@/components/missions/MissionList";
 import type { MissionCreate } from "@/types";
+import { PageHeader } from "@/components/ui";
+import { useT } from "@/i18n";
 
 export function MissionsPage() {
   const selectedDrone = useDroneStore((s) => s.selectedDrone);
+  const t = useT();
   const {
     missions,
     activeMission,
@@ -20,8 +23,8 @@ export function MissionsPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-white">Missions</h2>
+    <div className="space-y-5 animate-fade-in">
+      <PageHeader title={t("missions.title")} />
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-1 space-y-4">
           <MissionForm onSubmit={handleCreate} />
@@ -29,7 +32,7 @@ export function MissionsPage() {
         </div>
         <div className="col-span-2">
           <h3 className="text-sm font-semibold text-gray-300 mb-3">
-            Mission History
+            {t("missions.history")}
           </h3>
           <MissionList
             missions={missions}

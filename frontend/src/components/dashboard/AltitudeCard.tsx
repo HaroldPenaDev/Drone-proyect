@@ -1,13 +1,16 @@
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 import { useEffect, useRef } from "react";
+import { Mountain } from "lucide-react";
+import { Surface } from "@/components/ui";
+import { useT } from "@/i18n";
 
 interface AltitudeCardProps {
   altitude: number;
@@ -21,11 +24,13 @@ interface AltPoint {
   alt: number;
 }
 
-const MAX_POINTS = 60;
+const MAX_POINTS = 80;
 const altitudeHistory: AltPoint[] = [];
+const RAD_TO_DEG = 57.2958;
 
 export function AltitudeCard({ altitude, yaw, roll, pitch }: AltitudeCardProps) {
   const counter = useRef(0);
+  const t = useT();
 
   useEffect(() => {
     counter.current += 1;
@@ -34,38 +39,53 @@ export function AltitudeCard({ altitude, yaw, roll, pitch }: AltitudeCardProps) 
   }, [altitude]);
 
   return (
-    <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
+    <Surface padded>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-300">Altitud y Orientación</h3>
-          <div className="mt-2 text-3xl font-mono font-bold text-blue-400">
-            {altitude.toFixed(2)} <span className="text-sm text-gray-500">m</span>
+          <div className="eyebrow flex items-center gap-1.5">
+            <Mountain size={11} strokeWidth={1.75} />
+            {t("dashboard.altitude.title")}
+          </div>
+          <div className="hero-number text-accent mt-1">
+            {altitude.toFixed(2)}
+            <span className="text-sm text-ink-500 ml-1">m</span>
           </div>
         </div>
-        <div className="text-right text-xs space-y-1">
+        <div className="text-right text-[11px] space-y-0.5 font-mono">
           <div>
-            <span className="text-gray-500">Yaw:</span>{" "}
-            <span className="text-gray-200 font-mono">{(yaw * 57.2958).toFixed(1)}°</span>
+            <span className="text-ink-500 mr-1">YAW</span>
+            <span className="text-white">{(yaw * RAD_TO_DEG).toFixed(1)}°</span>
           </div>
           <div>
-            <span className="text-gray-500">Pitch:</span>{" "}
-            <span className="text-gray-200 font-mono">{(pitch * 57.2958).toFixed(1)}°</span>
+            <span className="text-ink-500 mr-1">PITCH</span>
+            <span className="text-white">{(pitch * RAD_TO_DEG).toFixed(1)}°</span>
           </div>
           <div>
-            <span className="text-gray-500">Roll:</span>{" "}
-            <span className="text-gray-200 font-mono">{(roll * 57.2958).toFixed(1)}°</span>
+            <span className="text-ink-500 mr-1">ROLL</span>
+            <span className="text-white">{(roll * RAD_TO_DEG).toFixed(1)}°</span>
           </div>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={120}>
         <LineChart data={[...altitudeHistory]}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="t" tick={{ fontSize: 9, fill: "#94a3b8" }} hide />
-          <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} domain={["auto", "auto"]} />
-          <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #334155", fontSize: 11 }} />
-          <Line type="monotone" dataKey="alt" stroke="#3b82f6" dot={false} strokeWidth={2} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1c2230" />
+          <XAxis dataKey="t" tick={{ fontSize: 9, fill: "#3a4254" }} hide />
+          <YAxis
+            tick={{ fontSize: 9, fill: "#3a4254" }}
+            domain={["auto", "auto"]}
+            width={28}
+          />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="alt"
+            stroke="#22d3ee"
+            dot={false}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </Surface>
   );
 }

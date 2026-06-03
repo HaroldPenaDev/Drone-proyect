@@ -1,9 +1,13 @@
 import time
 from typing import Tuple
 
+# numpy: librería para trabajar con vectores y matrices de forma rápida.
 import numpy as np
+# Etiqueta de tipo para indicar "vector de numpy con decimales".
 from numpy.typing import NDArray
+# scipy.solve_ivp: simula cómo cambia el dron en el tiempo a partir de sus fuerzas.
 from scipy.integrate import solve_ivp
+# scipy.Rotation: convierte ángulos de inclinación en algo que rota vectores en 3D.
 from scipy.spatial.transform import Rotation
 
 from src.models.drone_state import DroneState
@@ -51,12 +55,16 @@ def compute_motors_for_movement(
     return (motors[0], motors[1], motors[2], motors[3])
 
 
+# Aquí usamos scipy para armar una matriz de rotación a partir de los ángulos
+# de inclinación del dron, que después servirá para rotar vectores.
 def _build_rotation_matrix(orientation: NDArray[np.float64]) -> NDArray[np.float64]:
     return Rotation.from_euler(
         "ZYX", [orientation[2], orientation[1], orientation[0]]
     ).as_matrix()
 
 
+# Aquí leemos los valores del estado actual y al final usamos numpy para
+# devolver un vector con cómo está cambiando el dron en este instante.
 def _derivatives(
     _t: float,
     state_vector: NDArray[np.float64],
@@ -74,13 +82,18 @@ def _derivatives(
     return np.array([vx, vy, vz, ax, ay, az, wx, wy, wz, alpha_x, alpha_y, alpha_z])
 
 
+# Función principal: avanza el estado del dron un instante en el tiempo,
+# apoyándose en numpy para los vectores y en scipy para la simulación.
 def integrate_state(state: DroneState, movement: Movement, dt: float) -> DroneState:
     motors: Tuple[Motor, Motor, Motor, Motor] = compute_motors_for_movement(movement)
     rotation: NDArray[np.float64] = _build_rotation_matrix(state.orientation)
+    # Usamos numpy para crear los vectores iniciales de fuerza y torque.
     gravity: NDArray[np.float64] = np.array([0.0, 0.0, -DRONE_MASS_KG * GRAVITY_M_S2])
     total_force: NDArray[np.float64] = gravity.copy()
     total_torque: NDArray[np.float64] = np.zeros(3)
 
+    # Aquí usamos numpy para sumar fuerzas, rotar vectores con @ y calcular
+    # torques con cross, recorriendo los 4 motores del dron.
     for i, motor in enumerate(motors):
         thrust_body: NDArray[np.float64] = np.array([0.0, 0.0, motor.thrust_newtons])
         thrust_world: NDArray[np.float64] = rotation @ thrust_body
@@ -91,10 +104,14 @@ def integrate_state(state: DroneState, movement: Movement, dt: float) -> DroneSt
         )
         total_torque = total_torque + arm_torque + reaction_torque
 
+    # Aquí juntamos todo el estado del dron en un solo vector con numpy,
+    # porque scipy lo necesita así para poder simular el siguiente paso.
     state_vector: NDArray[np.float64] = np.concatenate([
         state.position, state.velocity, state.orientation, state.angular_velocity
     ])
 
+    # Aquí scipy simula el movimiento del dron entre el tiempo 0 y dt usando
+    # las fuerzas y torques calculados, y devuelve cómo quedó al final.
     solution = solve_ivp(
         fun=lambda t, y: _derivatives(t, y, total_force, total_torque),
         t_span=(0.0, dt),
@@ -103,6 +120,8 @@ def integrate_state(state: DroneState, movement: Movement, dt: float) -> DroneSt
         max_step=0.01,
     )
 
+    # Aquí usamos numpy para sacar los pedazos del vector resultado:
+    # posición, velocidad, orientación y velocidad angular.
     final: NDArray[np.float64] = solution.y[:, -1]
     new_position: NDArray[np.float64] = final[0:3]
     new_velocity: NDArray[np.float64] = final[3:6]

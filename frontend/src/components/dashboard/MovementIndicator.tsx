@@ -1,60 +1,93 @@
+import {
+  ArrowDown,
+  ArrowDownLeft,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowUpRight,
+  Pause,
+  RotateCcw,
+  RotateCw,
+  type LucideIcon,
+} from "lucide-react";
+import { Surface } from "@/components/ui";
+import { useT, type TranslationKey } from "@/i18n";
+
 interface MovementIndicatorProps {
   movement: string;
   missionActive: boolean;
 }
 
-const MOVEMENT_LABELS: Record<string, string> = {
-  hover: "Flotando",
-  ascend: "Ascendiendo",
-  descend: "Descendiendo",
-  left: "Izquierda",
-  right: "Derecha",
-  forward: "Adelante",
-  backward: "Atrás",
-  clockwise: "Giro horario",
-  counterclockwise: "Giro antihorario",
+const MOVEMENT_LABEL_KEYS: Record<string, TranslationKey> = {
+  hover: "move.hover",
+  ascend: "move.ascend",
+  descend: "move.descend",
+  left: "move.left",
+  right: "move.right",
+  forward: "move.forward",
+  backward: "move.backward",
+  clockwise: "move.clockwise",
+  counterclockwise: "move.counterclockwise",
 };
 
-const MOVEMENT_ICONS: Record<string, string> = {
-  hover: "⏸",
-  ascend: "⬆",
-  descend: "⬇",
-  left: "⬅",
-  right: "➡",
-  forward: "↑",
-  backward: "↓",
-  clockwise: "↻",
-  counterclockwise: "↺",
+const MOVEMENT_ICONS: Record<string, LucideIcon> = {
+  hover: Pause,
+  ascend: ArrowUp,
+  descend: ArrowDown,
+  left: ArrowLeft,
+  right: ArrowRight,
+  forward: ArrowUpRight,
+  backward: ArrowDownLeft,
+  clockwise: RotateCw,
+  counterclockwise: RotateCcw,
 };
 
-export function MovementIndicator({ movement, missionActive }: MovementIndicatorProps) {
-  const label = MOVEMENT_LABELS[movement] ?? movement;
-  const icon = MOVEMENT_ICONS[movement] ?? "•";
-  const borderColor = missionActive ? "border-green-500" : "border-drone-border";
-  const textColor = missionActive ? "text-green-400" : "text-gray-400";
-  const bgColor = missionActive ? "bg-green-900/20" : "bg-drone-panel";
-  const pulse = missionActive ? "animate-pulse" : "";
+export function MovementIndicator({
+  movement,
+  missionActive,
+}: MovementIndicatorProps) {
+  const t = useT();
+  const labelKey = MOVEMENT_LABEL_KEYS[movement];
+  const label = labelKey ? t(labelKey) : movement;
+  const Icon = MOVEMENT_ICONS[movement] ?? Pause;
+  const tone = missionActive ? "good" : "default";
 
   return (
-    <div
-      className={`${bgColor} ${borderColor} ${pulse} border-2 rounded-lg p-4 flex items-center gap-4`}
-    >
-      <div className="text-4xl">{icon}</div>
-      <div className="flex-1">
-        <div className="text-xs text-gray-500 uppercase tracking-wide">
-          Movimiento actual
+    <Surface tone={tone} padded>
+      <div className="flex items-center gap-4">
+        <div
+          className={`relative flex items-center justify-center w-14 h-14 rounded-xl ${
+            missionActive
+              ? "bg-good/15 ring-1 ring-good/30"
+              : "bg-white/[0.03] ring-1 ring-white/10"
+          }`}
+        >
+          <Icon
+            size={26}
+            strokeWidth={1.75}
+            className={missionActive ? "text-good" : "text-ink-500"}
+          />
+          {missionActive && (
+            <span className="absolute inset-0 rounded-xl bg-good/20 animate-pulse-soft" />
+          )}
         </div>
-        <div className={`text-xl font-semibold ${textColor}`}>{label}</div>
+        <div className="flex-1 min-w-0">
+          <div className="eyebrow">{t("dashboard.movement.label")}</div>
+          <div className="font-display text-xl font-semibold text-white mt-0.5">
+            {label}
+          </div>
+        </div>
+        <div className="shrink-0">
+          {missionActive ? (
+            <span className="badge badge-good">
+              <span className="live-dot" />
+              {t("status.flying")}
+            </span>
+          ) : (
+            <span className="badge badge-neutral">{t("status.idle")}</span>
+          )}
+        </div>
       </div>
-      <div
-        className={`px-3 py-1 rounded text-xs font-medium ${
-          missionActive
-            ? "bg-green-800 text-green-200"
-            : "bg-drone-dark text-gray-400"
-        }`}
-      >
-        {missionActive ? "Misión en curso" : "Reposo"}
-      </div>
-    </div>
+    </Surface>
   );
 }

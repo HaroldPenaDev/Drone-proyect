@@ -34,8 +34,8 @@ export function HistoryPage() {
               onClick={() => handleRangeChange(range.value)}
               className={`px-3 py-1 text-xs rounded ${
                 selectedRange === range.value
-                  ? "bg-drone-primary text-white"
-                  : "bg-drone-panel text-gray-400 border border-drone-border hover:text-white"
+                  ? "bg-accent text-white"
+                  : "bg-ink-100 text-gray-400 border border-white/5 hover:text-white"
               }`}
             >
               {range.label}
@@ -50,8 +50,8 @@ export function HistoryPage() {
             onClick={() => setSelectedArm(arm)}
             className={`px-3 py-1 text-xs rounded ${
               selectedArm === arm
-                ? "bg-drone-primary text-white"
-                : "bg-drone-panel text-gray-400 border border-drone-border"
+                ? "bg-accent text-white"
+                : "bg-ink-100 text-gray-400 border border-white/5"
             }`}
           >
             Arm {arm}

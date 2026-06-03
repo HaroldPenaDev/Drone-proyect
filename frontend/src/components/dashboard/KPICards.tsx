@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { Clock, Trophy, ShieldAlert, Activity } from "lucide-react";
 import type { DroneKpis } from "@/types";
 import { apiClient } from "@/api/client";
+import { Metric } from "@/components/ui";
+import { useT } from "@/i18n";
 
 interface KPICardsProps {
   droneId: string | null;
@@ -17,11 +20,11 @@ const formatFlightTime = (seconds: number): string => {
 
 export function KPICards({ droneId }: KPICardsProps) {
   const [kpis, setKpis] = useState<DroneKpis | null>(null);
+  const t = useT();
 
   useEffect(() => {
     if (!droneId) return;
     let cancelled = false;
-
     const load = async () => {
       try {
         const response = await apiClient.get<DroneKpis>(`/kpis/${droneId}`);
@@ -38,49 +41,41 @@ export function KPICards({ droneId }: KPICardsProps) {
     };
   }, [droneId]);
 
-  const cards = [
-    {
-      label: "Tiempo de vuelo",
-      value: kpis ? formatFlightTime(kpis.flight_time_seconds) : "—",
-      color: "text-blue-400",
-    },
-    {
-      label: "Misiones completadas",
-      value: kpis ? kpis.missions_completed.toString() : "—",
-      color: "text-green-400",
-    },
-    {
-      label: "Peor Safety Factor",
-      value: kpis ? kpis.worst_safety_factor.toFixed(2) : "—",
-      color:
-        kpis && kpis.worst_safety_factor < 1.5
-          ? "text-red-400"
-          : kpis && kpis.worst_safety_factor < 3
-          ? "text-amber-400"
-          : "text-green-400",
-    },
-    {
-      label: "Ciclos totales",
-      value: kpis ? kpis.total_cycles.toLocaleString() : "—",
-      color: "text-gray-200",
-    },
-  ];
+  const sf = kpis?.worst_safety_factor ?? 10;
+  const sfTone = sf < 1.5 ? "crit" : sf < 3 ? "warn" : "good";
+  const sfHint =
+    sfTone === "good"
+      ? t("dashboard.kpi.healthyHint")
+      : sfTone === "warn"
+        ? t("dashboard.kpi.warnHint")
+        : t("dashboard.kpi.critHint");
 
   return (
-    <div className="grid grid-cols-4 gap-3">
-      {cards.map((c) => (
-        <div
-          key={c.label}
-          className="bg-drone-panel rounded-lg p-3 border border-drone-border"
-        >
-          <div className="text-xs text-gray-500 uppercase tracking-wide">
-            {c.label}
-          </div>
-          <div className={`text-xl font-mono font-bold ${c.color} mt-1`}>
-            {c.value}
-          </div>
-        </div>
-      ))}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <Metric
+        label={t("dashboard.kpi.flightTime")}
+        value={kpis ? formatFlightTime(kpis.flight_time_seconds) : "—"}
+        icon={<Clock size={14} strokeWidth={1.75} />}
+        tone="accent"
+      />
+      <Metric
+        label={t("dashboard.kpi.missions")}
+        value={kpis ? kpis.missions_completed.toLocaleString() : "—"}
+        icon={<Trophy size={14} strokeWidth={1.75} />}
+        tone="good"
+      />
+      <Metric
+        label={t("dashboard.kpi.worstSf")}
+        value={kpis ? sf.toFixed(2) : "—"}
+        icon={<ShieldAlert size={14} strokeWidth={1.75} />}
+        tone={sfTone}
+        hint={sfHint}
+      />
+      <Metric
+        label={t("dashboard.kpi.cycles")}
+        value={kpis ? kpis.total_cycles.toLocaleString() : "—"}
+        icon={<Activity size={14} strokeWidth={1.75} />}
+      />
     </div>
   );
 }

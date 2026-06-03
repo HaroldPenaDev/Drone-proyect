@@ -21,7 +21,7 @@ export function AlertHistory() {
       {alerts.map((alert) => (
         <div
           key={alert.id}
-          className="bg-drone-panel rounded-lg p-3 border border-drone-border"
+          className="surface p-3"
         >
           <div className="flex justify-between items-start">
             <div>

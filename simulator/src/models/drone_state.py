@@ -2,7 +2,11 @@ from dataclasses import dataclass, field
 from typing import Tuple
 import time
 
+# numpy: librería para trabajar con vectores y matrices de forma rápida.
+# Aquí la usamos para guardar posición, velocidad, etc. del dron como
+# vectores de 3 números, y np.zeros(3) crea uno lleno de ceros.
 import numpy as np
+# Etiqueta de tipo para indicar "vector de numpy con decimales".
 from numpy.typing import NDArray
 
 from src.models.motor import Motor

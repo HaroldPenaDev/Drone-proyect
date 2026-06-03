@@ -33,14 +33,14 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
   };
 
   return (
-    <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
+    <div className="surface p-4">
       <h3 className="text-sm font-semibold text-gray-300 mb-3">New Mission</h3>
       <div className="flex flex-wrap gap-2 mb-3">
         {AVAILABLE_MOVEMENTS.map((m) => (
           <button
             key={m}
             onClick={() => addMovement(m)}
-            className="px-2 py-1 text-xs bg-drone-dark border border-drone-border rounded hover:border-drone-primary text-gray-300"
+            className="px-2 py-1 text-xs bg-ink-50 border border-white/5 rounded hover:border-accent text-gray-300"
           >
             {m}
           </button>
@@ -51,7 +51,7 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
           <span
             key={i}
             onClick={() => removeMovement(i)}
-            className="px-2 py-1 text-xs bg-drone-primary/20 text-drone-primary rounded cursor-pointer hover:bg-drone-primary/30"
+            className="px-2 py-1 text-xs bg-accent/20 text-accent rounded cursor-pointer hover:bg-accent/30"
           >
             {m} x
           </span>
@@ -60,7 +60,7 @@ export function MissionForm({ onSubmit }: MissionFormProps) {
       <button
         onClick={handleSubmit}
         disabled={submitting || !selectedDrone || movements.length === 0}
-        className="w-full py-2 bg-drone-primary text-white rounded text-sm font-medium disabled:opacity-50 hover:bg-blue-600 transition-colors"
+        className="w-full py-2 bg-accent text-white rounded text-sm font-medium disabled:opacity-50 hover:bg-blue-600 transition-colors"
       >
         {submitting ? "Creating..." : "Create Mission"}
       </button>

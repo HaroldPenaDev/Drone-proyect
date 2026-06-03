@@ -1,6 +1,8 @@
 from enum import Enum
 
+# numpy: librería para trabajar con vectores y matrices de forma rápida.
 import numpy as np
+# Etiqueta de tipo para indicar "vector de numpy con decimales".
 from numpy.typing import NDArray
 
 from src.constants.drone_specs import DRONE_MASS_KG, GRAVITY_M_S2, ARM_LENGTH_M
@@ -24,6 +26,7 @@ MIN_THRUST_PER_MOTOR_N: float = 0.0
 MAX_RPM: float = 12000.0
 HOVER_THRUST_N: float = (DRONE_MASS_KG * GRAVITY_M_S2) / 4.0
 
+# Aquí usamos numpy para crear un vector con la posición de cada motor.
 MOTOR_POSITIONS: list[NDArray[np.float64]] = [
     np.array([ARM_LENGTH_M, 0.0, 0.0]),
     np.array([0.0, ARM_LENGTH_M, 0.0]),

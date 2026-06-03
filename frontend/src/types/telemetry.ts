@@ -19,4 +19,17 @@ export interface DroneSnapshot {
   drone_id: string;
   timestamp: string;
   arms: [ArmSnapshot, ArmSnapshot, ArmSnapshot, ArmSnapshot];
+  altitude: number;
+  roll: number;
+  pitch: number;
+  yaw: number;
+}
+
+export interface DroneKpis {
+  drone_id: string;
+  flight_time_seconds: number;
+  missions_completed: number;
+  worst_safety_factor: number;
+  total_cycles: number;
+  max_degradation: number;
 }

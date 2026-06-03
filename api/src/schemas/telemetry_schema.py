@@ -31,3 +31,16 @@ class DroneSnapshotRead(BaseModel):
     drone_id: str
     timestamp: datetime
     arms: list[DroneSnapshotArm]
+    altitude: float = 0.0
+    roll: float = 0.0
+    pitch: float = 0.0
+    yaw: float = 0.0
+
+
+class DroneKpis(BaseModel):
+    drone_id: str
+    flight_time_seconds: float
+    missions_completed: int
+    worst_safety_factor: float
+    total_cycles: int
+    max_degradation: float

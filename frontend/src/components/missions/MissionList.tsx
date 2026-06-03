@@ -23,7 +23,7 @@ export function MissionList({ missions, onStart, onStop }: MissionListProps) {
       {missions.map((mission) => (
         <div
           key={mission.id}
-          className="bg-drone-panel rounded-lg p-3 border border-drone-border flex items-center justify-between"
+          className="surface p-3 flex items-center justify-between"
         >
           <div>
             <div className="flex items-center gap-2">

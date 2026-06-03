@@ -6,7 +6,7 @@ interface MissionDetailProps {
 
 export function MissionDetail({ mission }: MissionDetailProps) {
   return (
-    <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
+    <div className="surface p-4">
       <h3 className="text-sm font-semibold text-gray-300 mb-3">
         Active Mission
       </h3>
@@ -29,7 +29,7 @@ export function MissionDetail({ mission }: MissionDetailProps) {
             {mission.movements.map((m, i) => (
               <span
                 key={i}
-                className="px-2 py-0.5 text-xs bg-drone-dark rounded text-gray-300"
+                className="px-2 py-0.5 text-xs bg-ink-50 rounded text-gray-300"
               >
                 {m}
               </span>

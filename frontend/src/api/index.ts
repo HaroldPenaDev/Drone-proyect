@@ -9,3 +9,5 @@ export {
 } from "@/api/missions";
 export { fetchLatestTelemetry, fetchTelemetryHistory } from "@/api/telemetry";
 export { TelemetryWebSocket } from "@/api/websocket";
+export { fetchMissionAnalytics, compareMissions } from "@/api/analytics";
+export { uploadFlightCsv, templateUrl } from "@/api/ingest";

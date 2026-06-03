@@ -9,6 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { TelemetryPoint } from "@/types";
+import { ARM_LABEL_KEYS } from "@/utils/constants";
+import { Surface } from "@/components/ui";
+import { useT } from "@/i18n";
 
 interface ThrustTorqueChartProps {
   data: TelemetryPoint[];
@@ -16,6 +19,7 @@ interface ThrustTorqueChartProps {
 }
 
 export function ThrustTorqueChart({ data, armIndex }: ThrustTorqueChartProps) {
+  const t = useT();
   const filtered = data
     .filter((p) => p.arm_index === armIndex)
     .slice(-60)
@@ -26,22 +30,55 @@ export function ThrustTorqueChart({ data, armIndex }: ThrustTorqueChartProps) {
     }));
 
   return (
-    <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
-      <h3 className="text-sm font-medium text-gray-300 mb-3">
-        Thrust / Torque - Arm {armIndex}
-      </h3>
-      <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={filtered}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="time" tick={{ fontSize: 10, fill: "#94a3b8" }} />
-          <YAxis yAxisId="thrust" tick={{ fontSize: 10, fill: "#94a3b8" }} />
-          <YAxis yAxisId="torque" orientation="right" tick={{ fontSize: 10, fill: "#94a3b8" }} />
-          <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #334155" }} />
-          <Legend />
-          <Line yAxisId="thrust" type="monotone" dataKey="thrust" stroke="#3b82f6" dot={false} strokeWidth={2} />
-          <Line yAxisId="torque" type="monotone" dataKey="torque" stroke="#f59e0b" dot={false} strokeWidth={2} />
+    <Surface padded>
+      <div className="flex items-baseline justify-between mb-3">
+        <h3 className="font-display text-sm font-semibold text-white">
+          {ARM_LABEL_KEYS[armIndex] ? t(ARM_LABEL_KEYS[armIndex]) : `Arm ${armIndex}`}
+        </h3>
+        <span className="eyebrow">{t("dashboard.section.motorsHint")}</span>
+      </div>
+      <ResponsiveContainer width="100%" height={180}>
+        <LineChart data={filtered} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#1c2230" />
+          <XAxis dataKey="time" tick={{ fontSize: 9, fill: "#3a4254" }} />
+          <YAxis
+            yAxisId="thrust"
+            tick={{ fontSize: 9, fill: "#3a4254" }}
+            width={32}
+          />
+          <YAxis
+            yAxisId="torque"
+            orientation="right"
+            tick={{ fontSize: 9, fill: "#3a4254" }}
+            width={32}
+          />
+          <Tooltip />
+          <Legend
+            wrapperStyle={{ fontSize: 10, paddingTop: 4 }}
+            iconType="line"
+          />
+          <Line
+            yAxisId="thrust"
+            type="monotone"
+            dataKey="thrust"
+            name="Empuje (N)"
+            stroke="#22d3ee"
+            dot={false}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
+          <Line
+            yAxisId="torque"
+            type="monotone"
+            dataKey="torque"
+            name="Torque (Nm)"
+            stroke="#f59e0b"
+            dot={false}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </Surface>
   );
 }

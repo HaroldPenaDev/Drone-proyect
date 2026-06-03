@@ -1,31 +1,63 @@
-import { getSafetyColor } from "@/utils/formatters";
-import { ARM_LABELS, SAFETY_FACTOR_THRESHOLD } from "@/utils/constants";
+import { ARM_LABEL_KEYS, SAFETY_FACTOR_THRESHOLD } from "@/utils/constants";
+import {
+  safetyFactorToHex,
+  safetyFactorLabel,
+} from "@/components/drone-viewer/thermal";
+import { useT, type TranslationKey } from "@/i18n";
 
 interface SafetyFactorGaugeProps {
   armIndex: number;
   value: number;
 }
 
+const STATUS_LABEL_KEYS: Record<string, TranslationKey> = {
+  critical: "status.critical",
+  warn: "status.warn",
+  watch: "status.watch",
+  healthy: "status.healthy",
+  optimal: "status.optimal",
+};
+
 export function SafetyFactorGauge({ armIndex, value }: SafetyFactorGaugeProps) {
-  const color = getSafetyColor(value);
-  const percentage = Math.min((value / (SAFETY_FACTOR_THRESHOLD * 3)) * 100, 100);
+  const t = useT();
+  const color = safetyFactorToHex(value);
+  const status = safetyFactorLabel(value);
+  const percentage = Math.min((value / (SAFETY_FACTOR_THRESHOLD * 4)) * 100, 100);
 
   return (
-    <div className="bg-drone-panel rounded-lg p-4 border border-drone-border">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-xs text-gray-400">{ARM_LABELS[armIndex]}</span>
-        <span className="text-sm font-mono font-bold" style={{ color }}>
-          {value.toFixed(2)}
+    <div className="surface p-4 lift">
+      <div className="flex items-baseline justify-between mb-3">
+        <span className="eyebrow">{t(ARM_LABEL_KEYS[armIndex])}</span>
+        <span
+          className="text-[9px] font-mono font-bold tracking-wider"
+          style={{ color }}
+        >
+          {t(STATUS_LABEL_KEYS[status])}
         </span>
       </div>
-      <div className="w-full h-2 bg-drone-dark rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-300"
-          style={{ width: `${percentage}%`, backgroundColor: color }}
-        />
+      <div className="flex items-baseline justify-between mb-2">
+        <span
+          className="font-mono font-bold text-2xl tracking-tight"
+          style={{ color }}
+        >
+          {value.toFixed(2)}
+        </span>
+        <span className="text-[10px] font-mono text-ink-500">{t("sf.short")}</span>
       </div>
-      <div className="text-xs text-gray-500 mt-1">
-        Threshold: {SAFETY_FACTOR_THRESHOLD}
+      <div className="relative w-full h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{
+            width: `${percentage}%`,
+            backgroundColor: color,
+            boxShadow: `0 0 8px ${color}`,
+          }}
+        />
+        <div
+          className="absolute top-0 bottom-0 w-px bg-white/20"
+          style={{ left: `${(SAFETY_FACTOR_THRESHOLD / (SAFETY_FACTOR_THRESHOLD * 4)) * 100}%` }}
+          title="Threshold"
+        />
       </div>
     </div>
   );

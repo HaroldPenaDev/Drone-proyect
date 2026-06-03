@@ -44,7 +44,7 @@ async def _count_completed_missions(session: AsyncSession, drone_id: str) -> int
     stmt = (
         select(func.count(Mission.id))
         .where(Mission.drone_id == drone_uuid)
-        .where(Mission.status == MissionStatus.COMPLETED)
+        .where(Mission.status == MissionStatus.completed)
     )
     result = await session.execute(stmt)
     return int(result.scalar() or 0)
