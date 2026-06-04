@@ -3,7 +3,35 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
+  --color-ink-default: #f8fafc;
+  --color-ink-50: #ffffff;
+  --color-ink-100: #f1f5f9;
+  --color-ink-200: #e2e8f0;
+  --color-ink-300: #cbd5e1;
+  --color-ink-400: #94a3b8;
+  --color-ink-500: #64748b;
+  
+  --bg-gradient-1: rgba(34, 211, 238, 0.08);
+  --bg-gradient-2: rgba(245, 158, 11, 0.06);
+  --border-surface: rgba(15, 23, 42, 0.08);
+  --border-surface-hover: rgba(15, 23, 42, 0.15);
+}
+
+.dark {
   color-scheme: dark;
+  --color-ink-default: #06070b;
+  --color-ink-50: #0d0f15;
+  --color-ink-100: #11141c;
+  --color-ink-200: #161a23;
+  --color-ink-300: #1c2230;
+  --color-ink-400: #262d3d;
+  --color-ink-500: #3a4254;
+
+  --bg-gradient-1: rgba(34, 211, 238, 0.05);
+  --bg-gradient-2: rgba(245, 158, 11, 0.04);
+  --border-surface: rgba(255, 255, 255, 0.06);
+  --border-surface-hover: rgba(255, 255, 255, 0.10);
 }
 
 html, body, #root {
@@ -13,14 +41,15 @@ html, body, #root {
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #06070b;
+  background-color: var(--color-ink-default);
   background-image:
-    radial-gradient(at 20% 0%, rgba(34, 211, 238, 0.05) 0px, transparent 50%),
-    radial-gradient(at 80% 100%, rgba(245, 158, 11, 0.04) 0px, transparent 50%);
+    radial-gradient(at 20% 0%, var(--bg-gradient-1) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, var(--bg-gradient-2) 0px, transparent 50%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "cv11", "ss01";
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 ::-webkit-scrollbar {
@@ -44,7 +73,9 @@ body {
 @layer components {
   /* Surface — primary container, replaces "card" pattern. */
   .surface {
-    @apply relative rounded-xl bg-ink-100/80 backdrop-blur-sm border border-white/[0.06] shadow-surface;
+    @apply relative rounded-xl backdrop-blur-sm border shadow-surface;
+    border-color: var(--border-surface, rgba(255, 255, 255, 0.06));
+    background-color: color-mix(in srgb, var(--color-ink-100) 80%, transparent);
     background-image: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.025) 0%,
@@ -52,19 +83,26 @@ body {
     );
   }
   .surface-interactive {
-    @apply transition-all duration-200 hover:border-white/[0.10] hover:shadow-glow;
+    @apply transition-all duration-200 hover:shadow-glow;
+  }
+  .surface-interactive:hover {
+    border-color: var(--border-surface-hover, rgba(255, 255, 255, 0.10));
   }
   .surface-good {
-    @apply bg-ink-100/80 border border-good/20 bg-good-glow;
+    @apply border border-good/20 bg-good-glow;
+    background-color: color-mix(in srgb, var(--color-ink-100) 80%, transparent);
   }
   .surface-warn {
-    @apply bg-ink-100/80 border border-warn/30 bg-warn-glow;
+    @apply border border-warn/30 bg-warn-glow;
+    background-color: color-mix(in srgb, var(--color-ink-100) 80%, transparent);
   }
   .surface-crit {
-    @apply bg-ink-100/80 border border-crit/40 bg-critical-glow;
+    @apply border border-crit/40 bg-critical-glow;
+    background-color: color-mix(in srgb, var(--color-ink-100) 80%, transparent);
   }
   .surface-accent {
-    @apply bg-ink-100/80 border border-accent/30 bg-surface-glow;
+    @apply border border-accent/30 bg-surface-glow;
+    background-color: color-mix(in srgb, var(--color-ink-100) 80%, transparent);
   }
 
   /* Eyebrow label — small uppercase descriptor above big numbers. */
@@ -77,15 +115,18 @@ body {
 
   /* Hero number — big mono numeric display. */
   .hero-number {
-    @apply font-mono font-bold text-white text-3xl tracking-tight;
+    @apply font-mono font-bold text-3xl tracking-tight;
+    color: #ffffff;
   }
   .hero-number-sm {
-    @apply font-mono font-bold text-white text-xl tracking-tight;
+    @apply font-mono font-bold text-xl tracking-tight;
+    color: #ffffff;
   }
 
   /* Section title with optional eyebrow. */
   .section-title {
-    @apply font-display text-xl font-semibold text-white tracking-tight;
+    @apply font-display text-xl font-semibold tracking-tight;
+    color: #ffffff;
   }
 
   /* Live indicator dot with pulse halo. */
@@ -143,3 +184,84 @@ body {
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 10px !important;
 }
+
+/* Transición suave global de colores excepto en canvas 3D y elementos con animaciones */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+canvas, canvas *, .animate-spin, .animate-pulse-soft, .animate-live-pulse {
+  transition: none !important;
+}
+
+/* --- ADAPTACIONES EXCLUSIVAS PARA MODO CLARO --- */
+html:not(.dark) {
+  /* Sobreescritura inteligente de text-white para que sea oscuro, respetando botones coloreados y badges */
+  [class~="text-white"], .hero-number, .hero-number-sm, .section-title {
+    color: #0f172a !important; 
+  }
+  
+  /* Excluir de la conversión a negro el texto blanco dentro de fondos con color o badges */
+  [class*="bg-accent"] [class~="text-white"],
+  [class*="bg-crit"] [class~="text-white"],
+  [class*="bg-good"] [class~="text-white"],
+  [class*="bg-warn"] [class~="text-white"],
+  [class~="badge"] [class~="text-white"],
+  button[class*="bg-accent"] [class~="text-white"],
+  [class*="shadow-glow-crit"] [class~="text-white"] {
+    color: #ffffff !important;
+  }
+
+  /* Sobreescribir las clases de bordes con opacidad blanca de Tailwind a opacidad negra */
+  [class~="border-white/[0.06]"] { border-color: rgba(15, 23, 42, 0.08) !important; }
+  [class~="border-white/5"] { border-color: rgba(15, 23, 42, 0.05) !important; }
+  [class~="border-white/10"] { border-color: rgba(15, 23, 42, 0.10) !important; }
+  [class~="border-white/[0.04]"] { border-color: rgba(15, 23, 42, 0.04) !important; }
+  
+  /* Sobreescribir las clases de fondo con opacidad blanca de Tailwind a opacidad negra */
+  [class~="bg-white/[0.03]"] { background-color: rgba(15, 23, 42, 0.03) !important; }
+  [class~="bg-white/5"] { background-color: rgba(15, 23, 42, 0.05) !important; }
+  [class~="bg-white/[0.02]"] { background-color: rgba(15, 23, 42, 0.015) !important; }
+  [class~="bg-white/[0.04]"] { background-color: rgba(15, 23, 42, 0.04) !important; }
+  
+  /* Estados hover correspondientes */
+  [class~="hover:bg-white/[0.04]"]:hover { background-color: rgba(15, 23, 42, 0.04) !important; }
+  [class~="hover:bg-white/5"]:hover { background-color: rgba(15, 23, 42, 0.05) !important; }
+  [class~="hover:border-white/15"]:hover { border-color: rgba(15, 23, 42, 0.15) !important; }
+  [class~="hover:border-white/25"]:hover { border-color: rgba(15, 23, 42, 0.25) !important; }
+
+  /* Adaptación de tarjetas `.surface` */
+  .surface {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+    background-image: none !important;
+  }
+
+  /* Barras de scroll adaptativas */
+  ::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.12) !important;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 23, 42, 0.22) !important;
+  }
+
+  /* Gráficos Recharts en modo claro */
+  .recharts-default-tooltip {
+    background-color: rgba(255, 255, 255, 0.96) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
+  }
+  .recharts-tooltip-label {
+    color: #475569 !important; /* slate-600 */
+  }
+  .recharts-cartesian-grid line {
+    stroke: #e2e8f0 !important; /* slate-200 */
+  }
+  .recharts-cartesian-axis-tick text {
+    fill: #64748b !important; /* slate-500 */
+  }
+  .recharts-legend-item-text {
+    color: #334155 !important; /* slate-700 */
+  }
+}
+

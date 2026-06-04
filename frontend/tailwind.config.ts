@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
@@ -12,13 +13,13 @@ const config: Config = {
       colors: {
         // New palette — kept legacy "drone-*" aliases for back-compat.
         ink: {
-          DEFAULT: "#06070b",
-          50: "#0d0f15",
-          100: "#11141c",
-          200: "#161a23",
-          300: "#1c2230",
-          400: "#262d3d",
-          500: "#3a4254",
+          DEFAULT: "var(--color-ink-default)",
+          50: "var(--color-ink-50)",
+          100: "var(--color-ink-100)",
+          200: "var(--color-ink-200)",
+          300: "var(--color-ink-300)",
+          400: "var(--color-ink-400)",
+          500: "var(--color-ink-500)",
         },
         accent: {
           DEFAULT: "#22d3ee",

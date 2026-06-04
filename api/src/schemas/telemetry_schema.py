@@ -23,6 +23,7 @@ class DroneSnapshotArm(BaseModel):
     arm_index: int
     thrust: float
     torque: float
+    rpm: float = 0.0
     safety_factor: float
     degradation_factor: float
 

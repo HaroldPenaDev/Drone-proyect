@@ -35,7 +35,24 @@ export function MissionList({ missions, onStart, onStop }: MissionListProps) {
               </span>
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {mission.movements.join(" → ")}
+              {(() => {
+                try {
+                  const first = mission.movements[0];
+                  const parsed = JSON.parse(first);
+                  if (parsed?.type === "motor_test") {
+                    return (
+                      <span className="flex gap-2">
+                        {(["m1","m2","m3","m4"] as const).map((k, i) => (
+                          <span key={k} className="font-mono">
+                            M{i+1}: <span className="text-cyan-400 font-bold">{Math.round(parsed[k]*100)}%</span>
+                          </span>
+                        ))}
+                      </span>
+                    );
+                  }
+                } catch {}
+                return mission.movements.join(" → ");
+              })()}
             </div>
           </div>
           <div className="flex gap-2">

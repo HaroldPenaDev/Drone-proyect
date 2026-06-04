@@ -37,6 +37,26 @@ def compute_rpm_from_thrust(thrust: float) -> float:
     return min((thrust / 8.0) * MAX_RPM, MAX_RPM)
 
 
+def compute_motors_for_test(
+    throttles: list[float],
+) -> Tuple[Motor, Motor, Motor, Motor]:
+    """Build 4 motors from explicit throttle values (0.0 = 0%, 1.0 = 100%)."""
+    from src.constants.motor_specs import MAX_THRUST_PER_MOTOR_N
+    motors: list[Motor] = []
+    for i in range(4):
+        t = max(0.0, min(1.0, throttles[i]))
+        thrust: float = t * MAX_THRUST_PER_MOTOR_N
+        motors.append(
+            Motor(
+                arm_index=i,
+                thrust_newtons=thrust,
+                torque_nm=compute_torque_from_thrust(thrust),
+                rpm=compute_rpm_from_thrust(thrust),
+            )
+        )
+    return (motors[0], motors[1], motors[2], motors[3])
+
+
 def compute_motors_for_movement(
     movement: Movement,
 ) -> Tuple[Motor, Motor, Motor, Motor]:
@@ -84,8 +104,16 @@ def _derivatives(
 
 # Función principal: avanza el estado del dron un instante en el tiempo,
 # apoyándose en numpy para los vectores y en scipy para la simulación.
-def integrate_state(state: DroneState, movement: Movement, dt: float) -> DroneState:
-    motors: Tuple[Motor, Motor, Motor, Motor] = compute_motors_for_movement(movement)
+def integrate_state(
+    state: DroneState,
+    movement: Movement,
+    dt: float,
+    motor_throttles: list[float] | None = None,
+) -> DroneState:
+    if motor_throttles is not None:
+        motors: Tuple[Motor, Motor, Motor, Motor] = compute_motors_for_test(motor_throttles)
+    else:
+        motors = compute_motors_for_movement(movement)
     rotation: NDArray[np.float64] = _build_rotation_matrix(state.orientation)
     # Usamos numpy para crear los vectores iniciales de fuerza y torque.
     gravity: NDArray[np.float64] = np.array([0.0, 0.0, -DRONE_MASS_KG * GRAVITY_M_S2])
@@ -129,7 +157,15 @@ def integrate_state(state: DroneState, movement: Movement, dt: float) -> DroneSt
     new_angular_velocity: NDArray[np.float64] = final[9:12]
     new_acceleration: NDArray[np.float64] = total_force / DRONE_MASS_KG
 
-    new_position[2] = max(new_position[2], 0.0)
+    if motor_throttles is not None:
+        # Test bench mode: drone is bolted down, physics do not change position
+        new_position = state.position
+        new_velocity = np.zeros(3)
+        new_orientation = state.orientation
+        new_angular_velocity = np.zeros(3)
+        new_acceleration = np.zeros(3)
+    else:
+        new_position[2] = max(new_position[2], 0.0)
 
     return DroneState(
         position=new_position,

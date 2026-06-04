@@ -4,6 +4,7 @@ import { useAlertStore } from "@/stores/alertStore";
 import type { Drone } from "@/types";
 import { Badge } from "@/components/ui";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useT, useLangStore } from "@/i18n";
 
 export function Header() {
@@ -67,6 +68,7 @@ export function Header() {
         </div>
 
         <LanguageToggle />
+        <ThemeToggle />
 
         <button className="relative p-2 rounded-lg hover:bg-white/[0.04] transition-colors">
           <Bell size={16} className="text-ink-500" strokeWidth={1.75} />

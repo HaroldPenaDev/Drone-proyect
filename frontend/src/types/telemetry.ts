@@ -11,6 +11,7 @@ export interface ArmSnapshot {
   arm_index: number;
   thrust: number;
   torque: number;
+  rpm: number;
   safety_factor: number;
   degradation_factor: number;
 }

@@ -48,8 +48,22 @@ export function MovementIndicator({
 }: MovementIndicatorProps) {
   const t = useT();
   const labelKey = MOVEMENT_LABEL_KEYS[movement];
-  const label = labelKey ? t(labelKey) : movement;
-  const Icon = MOVEMENT_ICONS[movement] ?? Pause;
+  
+  let label = labelKey ? t(labelKey) : movement;
+  let Icon = MOVEMENT_ICONS[movement] ?? Pause;
+
+  if (!labelKey) {
+    try {
+      const parsed = JSON.parse(movement);
+      if (parsed.type === "motor_test") {
+        label = "Prueba de Motores";
+        Icon = RotateCw; // or any suitable icon
+      }
+    } catch {
+      // not JSON
+    }
+  }
+
   const tone = missionActive ? "good" : "default";
 
   return (

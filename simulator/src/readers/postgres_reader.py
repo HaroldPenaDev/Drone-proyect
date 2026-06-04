@@ -55,6 +55,26 @@ class PostgresReader:
             )
             logger.info("Mission %s marked as completed", mission_id)
 
+    async def abort_mission(self, mission_id: str):
+        if not self._pool:
+            await self.connect()
+        async with self._pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE missions SET status = 'aborted', ended_at = NOW() WHERE id = $1",
+                mission_id,
+            )
+            logger.info("Mission %s aborted (motor failure)", mission_id)
+
+    async def is_mission_still_running(self, mission_id: str) -> bool:
+        """Check if the mission is still in 'running' state (not aborted/completed externally)."""
+        if not self._pool:
+            await self.connect()
+        async with self._pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT status FROM missions WHERE id = $1", mission_id
+            )
+        return row is not None and row["status"] == "running"
+
     async def close(self):
         if self._pool:
             await self._pool.close()

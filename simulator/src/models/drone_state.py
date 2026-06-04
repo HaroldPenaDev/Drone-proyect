@@ -36,3 +36,17 @@ class DroneState:
         return DroneState(
             position=np.array([0.0, 0.0, altitude]),
         )
+
+    @staticmethod
+    def fresh(altitude: float = 1.0) -> "DroneState":
+        """Full reset: physics + materials + safety factors all back to defaults."""
+        return DroneState(
+            position=np.array([0.0, 0.0, altitude]),
+            velocity=np.zeros(3),
+            acceleration=np.zeros(3),
+            orientation=np.zeros(3),
+            angular_velocity=np.zeros(3),
+            motors=tuple(Motor.idle(i) for i in range(4)),
+            material_states=tuple(Material() for _ in range(4)),
+            safety_factors=(10.0, 10.0, 10.0, 10.0),
+        )

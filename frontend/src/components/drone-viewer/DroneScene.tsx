@@ -4,6 +4,7 @@ import { DroneModel } from "@/components/drone-viewer/DroneModel";
 import { ThermalLegend } from "@/components/drone-viewer/ThermalLegend";
 import type { DroneSnapshot } from "@/types";
 import { useT } from "@/i18n";
+import { useThemeStore } from "@/stores";
 
 interface DroneSceneProps {
   snapshot: DroneSnapshot | null;
@@ -17,20 +18,19 @@ export function DroneScene({
   showLegend = true,
 }: DroneSceneProps) {
   const t = useT();
+  const theme = useThemeStore((s) => s.theme);
+  const isDark = theme === "dark";
+
   return (
     <div
-      className={`relative surface overflow-hidden ${height}`}
-      style={{
-        background:
-          "radial-gradient(ellipse at center, #0d0f15 0%, #06070b 80%)",
-      }}
+      className={`relative surface overflow-hidden ${height} scene-bg`}
     >
       <Canvas
         camera={{ position: [0.55, 0.42, 0.55], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.35} />
-        <directionalLight position={[5, 5, 5]} intensity={0.7} />
+        <ambientLight intensity={isDark ? 0.35 : 0.6} />
+        <directionalLight position={[5, 5, 5]} intensity={isDark ? 0.7 : 0.8} />
         <directionalLight position={[-5, 3, -2]} intensity={0.3} color="#22d3ee" />
         <pointLight position={[0, 1, 0]} intensity={0.4} color="#f59e0b" />
 
@@ -40,10 +40,10 @@ export function DroneScene({
           args={[10, 10]}
           cellSize={0.1}
           cellThickness={0.5}
-          cellColor="#1c2230"
+          cellColor={isDark ? "#1c2230" : "#cbd5e1"}
           sectionSize={0.5}
           sectionThickness={1}
-          sectionColor="#262d3d"
+          sectionColor={isDark ? "#262d3d" : "#94a3b8"}
           fadeDistance={3}
           fadeStrength={1.5}
           position={[0, -0.1, 0]}
@@ -82,3 +82,4 @@ export function DroneScene({
     </div>
   );
 }
+
