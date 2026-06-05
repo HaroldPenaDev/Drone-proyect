@@ -8,6 +8,7 @@ import {
   Microscope,
   Upload,
   PlayCircle,
+  Gamepad2,
   type LucideIcon,
 } from "lucide-react";
 import { useT } from "@/i18n";
@@ -32,6 +33,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/missions", labelKey: "nav.missions", icon: Route },
       { to: "/history", labelKey: "nav.history", icon: History },
       { to: "/playback", labelKey: "nav.playback", icon: PlayCircle },
+      { to: "/pilot", labelKey: "nav.pilot", icon: Gamepad2 },
     ],
   },
   {

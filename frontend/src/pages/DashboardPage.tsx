@@ -11,6 +11,7 @@ import { DegradationChart } from "@/components/dashboard/DegradationChart";
 import { DroneScene } from "@/components/drone-viewer/DroneScene";
 import { AlertBanner } from "@/components/alerts/AlertBanner";
 import { PageHeader, Badge } from "@/components/ui";
+import { actionMovements, parseMovement } from "@/components/missions/movement";
 import { useT } from "@/i18n";
 
 export function DashboardPage() {
@@ -28,19 +29,31 @@ export function DashboardPage() {
 
   const currentMovement = useMemo(() => {
     if (!activeMission || activeMission.status !== "running") return "hover";
-    const movements = activeMission.movements ?? [];
-    if (movements.length === 0) return "hover";
-    if (!activeMission.started_at) return movements[0];
-    const elapsedSec = Math.max(
+    const raw = activeMission.movements ?? [];
+    // Test de motores: deja pasar el token JSON, MovementIndicator lo muestra.
+    if (raw.length > 0) {
+      try {
+        if (JSON.parse(raw[0])?.type === "motor_test") return raw[0];
+      } catch {
+        /* no es JSON */
+      }
+    }
+    // Misión de vuelo: ignora el perfil de motores y usa las acciones reales,
+    // avanzando según la duración acumulada de cada una.
+    const actions = actionMovements(raw);
+    if (actions.length === 0) return "hover";
+    if (!activeMission.started_at) return parseMovement(actions[0]).action;
+    const elapsed = Math.max(
       0,
       (Date.now() - new Date(activeMission.started_at).getTime()) / 1000,
     );
-    const stepSeconds = 5;
-    const idx = Math.min(
-      Math.floor(elapsedSec / stepSeconds),
-      movements.length - 1,
-    );
-    return movements[idx];
+    let acc = 0;
+    for (const a of actions) {
+      const { action, seconds } = parseMovement(a);
+      acc += seconds ?? 4;
+      if (elapsed < acc) return action;
+    }
+    return parseMovement(actions[actions.length - 1]).action;
   }, [activeMission]);
 
   const missionActive = activeMission?.status === "running";

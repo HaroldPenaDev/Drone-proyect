@@ -58,6 +58,9 @@ export function MovementIndicator({
       if (parsed.type === "motor_test") {
         label = "Prueba de Motores";
         Icon = RotateCw; // or any suitable icon
+      } else if (parsed.type === "flight_config") {
+        label = t("status.flying");
+        Icon = Pause;
       }
     } catch {
       // not JSON

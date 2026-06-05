@@ -1,4 +1,9 @@
 import type { Mission } from "@/types";
+import {
+  formatMovement,
+  actionMovements,
+  missionMotorProfile,
+} from "@/components/missions/movement";
 
 interface MissionDetailProps {
   mission: Mission;
@@ -23,15 +28,23 @@ export function MissionDetail({ mission }: MissionDetailProps) {
               : "—"}
           </span>
         </div>
+        {missionMotorProfile(mission.movements) && (
+          <div className="flex justify-between">
+            <span className="text-gray-400">Motores</span>
+            <span className="text-accent font-mono text-xs">
+              {missionMotorProfile(mission.movements)!.map((e) => `${e}%`).join(" · ")}
+            </span>
+          </div>
+        )}
         <div>
           <span className="text-gray-400">Movements</span>
           <div className="flex flex-wrap gap-1 mt-1">
-            {mission.movements.map((m, i) => (
+            {actionMovements(mission.movements).map((m, i) => (
               <span
                 key={i}
                 className="px-2 py-0.5 text-xs bg-ink-50 rounded text-gray-300"
               >
-                {m}
+                {formatMovement(m)}
               </span>
             ))}
           </div>

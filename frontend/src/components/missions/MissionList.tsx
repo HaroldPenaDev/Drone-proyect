@@ -1,4 +1,9 @@
 import type { Mission } from "@/types";
+import {
+  formatMovement,
+  actionMovements,
+  missionMotorProfile,
+} from "@/components/missions/movement";
 
 interface MissionListProps {
   missions: Mission[];
@@ -51,7 +56,10 @@ export function MissionList({ missions, onStart, onStop }: MissionListProps) {
                     );
                   }
                 } catch {}
-                return mission.movements.join(" → ");
+                const moves = actionMovements(mission.movements)
+                  .map(formatMovement)
+                  .join(" → ");
+                return missionMotorProfile(mission.movements) ? `⚙️ ${moves}` : moves;
               })()}
             </div>
           </div>

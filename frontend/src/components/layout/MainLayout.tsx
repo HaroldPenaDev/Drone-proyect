@@ -1,8 +1,18 @@
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { useDroneStore } from "@/stores/droneStore";
 
 export function MainLayout() {
+  const loadDrones = useDroneStore((s) => s.loadDrones);
+
+  // Carga los drones en cualquier página (no solo el Dashboard) y auto-
+  // selecciona el primero, para que crear misiones funcione de inmediato.
+  useEffect(() => {
+    loadDrones();
+  }, [loadDrones]);
+
   return (
     <div className="h-screen flex bg-ink">
       <Sidebar />

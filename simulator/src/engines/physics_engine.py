@@ -59,11 +59,18 @@ def compute_motors_for_test(
 
 def compute_motors_for_movement(
     movement: Movement,
+    efficiency: list[float] | None = None,
 ) -> Tuple[Motor, Motor, Motor, Motor]:
+    """Empuje por motor para un movimiento, escalado por el perfil de
+    eficiencia/potencia de cada motor (1.0 = motor sano). Motores desiguales
+    -> brazos con distinto esfuerzo -> desgaste asimétrico."""
     multipliers: list[float] = THRUST_MULTIPLIERS[movement]
     motors: list[Motor] = []
     for i in range(4):
-        thrust: float = HOVER_THRUST_N * multipliers[i]
+        eff: float = (
+            efficiency[i] if efficiency is not None and i < len(efficiency) else 1.0
+        )
+        thrust: float = HOVER_THRUST_N * multipliers[i] * eff
         motors.append(
             Motor(
                 arm_index=i,
@@ -109,11 +116,12 @@ def integrate_state(
     movement: Movement,
     dt: float,
     motor_throttles: list[float] | None = None,
+    motor_efficiency: list[float] | None = None,
 ) -> DroneState:
     if motor_throttles is not None:
         motors: Tuple[Motor, Motor, Motor, Motor] = compute_motors_for_test(motor_throttles)
     else:
-        motors = compute_motors_for_movement(movement)
+        motors = compute_motors_for_movement(movement, motor_efficiency)
     rotation: NDArray[np.float64] = _build_rotation_matrix(state.orientation)
     # Usamos numpy para crear los vectores iniciales de fuerza y torque.
     gravity: NDArray[np.float64] = np.array([0.0, 0.0, -DRONE_MASS_KG * GRAVITY_M_S2])

@@ -22,6 +22,27 @@ logger = logging.getLogger(__name__)
 shutdown_event: asyncio.Event = asyncio.Event()
 
 
+def _parse_movement(raw: str, dt: float, default_seconds: float = 4.0):
+    """Parse 'action' o 'action:seconds' -> (Movement, ciclos).
+
+    Retrocompatible: una acción sin ':' usa la duración por defecto.
+    Devuelve None si la acción no es válida (se ignora).
+    """
+    name, sep, secs = raw.partition(":")
+    seconds = default_seconds
+    if sep and secs:
+        try:
+            seconds = float(secs)
+        except ValueError:
+            seconds = default_seconds
+    seconds = max(0.5, min(120.0, seconds))
+    try:
+        movement = Movement(name)
+    except ValueError:
+        return None
+    return movement, max(1, int(round(seconds / dt)))
+
+
 async def simulation_loop(settings: SimulatorSettings) -> None:
     writer = InfluxDBWriter(settings)
     reader = PostgresReader(settings)
@@ -43,10 +64,12 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
     # Mission management
     current_mission_id = None
     current_mission_movements = []
+    current_movement_cycles: list[int] = []  # ciclos que dura cada acción
     movement_index = 0
     movement_cycle_count = 0
     motor_test_throttles: list[float] | None = None  # None = normal mission
-    CYCLES_PER_MOVEMENT = int(4.0 / dt)  # 4 seconds per movement
+    current_mission_efficiency: list[float] = [1.0, 1.0, 1.0, 1.0]  # perfil de motores
+    DEFAULT_CYCLES_PER_MOVEMENT = int(4.0 / dt)  # fallback: 4 s por acción
 
     logger.info("Simulator started for drone %s", settings.simulator_drone_id)
 
@@ -57,29 +80,50 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
             if mission:
                 current_mission_id = mission["id"]
                 raw_movements = mission["movements"]
-                # Detect motor_test mission: first movement is JSON with type="motor_test"
+                # Detect special first element (JSON): motor_test bench, o perfil
+                # de motores (flight_config) para una misión de vuelo.
                 motor_test_throttles = None
+                current_mission_efficiency = [1.0, 1.0, 1.0, 1.0]
+                action_movements = raw_movements
                 if raw_movements and isinstance(raw_movements[0], str):
                     try:
                         first = json.loads(raw_movements[0])
-                        if isinstance(first, dict) and first.get("type") == "motor_test":
-                            motor_test_throttles = [
-                                float(first.get("m1", 0.0)),
-                                float(first.get("m2", 0.0)),
-                                float(first.get("m3", 0.0)),
-                                float(first.get("m4", 0.0)),
-                            ]
-                            current_mission_movements = [Movement.HOVER]  # placeholder
-                            logger.info(
-                                "Motor Test Mission %s | Throttles: M1=%.0f%% M2=%.0f%% M3=%.0f%% M4=%.0f%%",
-                                current_mission_id,
-                                motor_test_throttles[0]*100, motor_test_throttles[1]*100,
-                                motor_test_throttles[2]*100, motor_test_throttles[3]*100,
-                            )
-                    except (json.JSONDecodeError, KeyError):
-                        pass
+                    except (json.JSONDecodeError, ValueError):
+                        first = None
+                    if isinstance(first, dict) and first.get("type") == "motor_test":
+                        motor_test_throttles = [
+                            float(first.get("m1", 0.0)),
+                            float(first.get("m2", 0.0)),
+                            float(first.get("m3", 0.0)),
+                            float(first.get("m4", 0.0)),
+                        ]
+                        current_mission_movements = [Movement.HOVER]  # placeholder
+                        current_movement_cycles = [DEFAULT_CYCLES_PER_MOVEMENT]
+                        logger.info(
+                            "Motor Test Mission %s | Throttles: M1=%.0f%% M2=%.0f%% M3=%.0f%% M4=%.0f%%",
+                            current_mission_id,
+                            motor_test_throttles[0]*100, motor_test_throttles[1]*100,
+                            motor_test_throttles[2]*100, motor_test_throttles[3]*100,
+                        )
+                    elif isinstance(first, dict) and first.get("type") == "flight_config":
+                        raw_eff = first.get("eff") or [1.0, 1.0, 1.0, 1.0]
+                        current_mission_efficiency = [
+                            max(0.0, min(2.0, float(e))) for e in list(raw_eff)[:4]
+                        ]
+                        action_movements = raw_movements[1:]
+                        logger.info(
+                            "Flight mission %s | Motor efficiency: %s",
+                            current_mission_id, current_mission_efficiency,
+                        )
                 if motor_test_throttles is None:
-                    current_mission_movements = [Movement(m) for m in raw_movements]
+                    parsed = [
+                        p for p in (_parse_movement(m, dt) for m in action_movements)
+                        if p is not None
+                    ]
+                    if not parsed:
+                        parsed = [(Movement.HOVER, DEFAULT_CYCLES_PER_MOVEMENT)]
+                    current_mission_movements = [p[0] for p in parsed]
+                    current_movement_cycles = [p[1] for p in parsed]
                 movement_index = 0
                 movement_cycle_count = 0
                 state = DroneState.fresh()  # Reset full state per-mission (physics + materials)
@@ -106,8 +150,13 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
             movement_cycle_count += 1
             
             # Motor test missions will now finish naturally
-            # If current movement is finished
-            if movement_cycle_count >= CYCLES_PER_MOVEMENT:
+            # If current movement is finished (cada acción puede durar distinto)
+            cycles_for_this = (
+                current_movement_cycles[movement_index]
+                if movement_index < len(current_movement_cycles)
+                else DEFAULT_CYCLES_PER_MOVEMENT
+            )
+            if movement_cycle_count >= cycles_for_this:
                 movement_index += 1
                 movement_cycle_count = 0
             
@@ -127,7 +176,11 @@ async def simulation_loop(settings: SimulatorSettings) -> None:
 
 
         # 3. Physics & Degradation
-        state = integrate_state(state, movement, dt, motor_throttles=motor_test_throttles)
+        state = integrate_state(
+            state, movement, dt,
+            motor_throttles=motor_test_throttles,
+            motor_efficiency=current_mission_efficiency,
+        )
         thrusts = tuple(m.thrust_newtons for m in state.motors)
         safety_factors = compute_all_safety_factors(state.material_states, thrusts)
 

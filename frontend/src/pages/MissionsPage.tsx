@@ -5,6 +5,7 @@ import { MissionForm } from "@/components/missions/MissionForm";
 import { MissionDetail } from "@/components/missions/MissionDetail";
 import { MissionList } from "@/components/missions/MissionList";
 import { MotorTestForm } from "@/components/missions/MotorTestForm";
+import { MotorProfileForm } from "@/components/missions/MotorProfileForm";
 import type { MissionCreate } from "@/types";
 import { PageHeader } from "@/components/ui";
 import { useT } from "@/i18n";
@@ -57,9 +58,14 @@ export function MissionsPage() {
         </button>
       </div>
 
-      {activeTab === "flight" && (
+      {/* Ambas pestañas quedan montadas (ocultas con CSS) para no perder la
+          configuración al cambiar entre ellas. */}
+      <div className={activeTab === "flight" ? "" : "hidden"}>
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-1 space-y-4">
+            {/* Paso 1: configurar motores (persistente, lo usa la misión) */}
+            <MotorProfileForm />
+            {/* Paso 2: definir y crear la misión */}
             <MissionForm onSubmit={handleCreate} />
             {activeMission && <MissionDetail mission={activeMission} />}
           </div>
@@ -74,9 +80,9 @@ export function MissionsPage() {
             />
           </div>
         </div>
-      )}
+      </div>
 
-      {activeTab === "motor_test" && (
+      <div className={activeTab === "motor_test" ? "" : "hidden"}>
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-1">
             <MotorTestForm />
@@ -100,7 +106,7 @@ export function MissionsPage() {
             />
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { IngestPage } from "@/pages/IngestPage";
 import { PredictivePage } from "@/pages/PredictivePage";
 import { ValidationPage } from "@/pages/ValidationPage";
 import { PlaybackPage } from "@/pages/PlaybackPage";
+import { LivePilotPage } from "@/pages/LivePilotPage";
 
 export function App() {
   return (
@@ -22,6 +23,7 @@ export function App() {
           <Route path="/predictive" element={<PredictivePage />} />
           <Route path="/validation" element={<ValidationPage />} />
           <Route path="/playback" element={<PlaybackPage />} />
+        <Route path="/pilot" element={<LivePilotPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
